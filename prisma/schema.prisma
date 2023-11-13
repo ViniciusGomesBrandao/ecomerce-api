@@ -1,0 +1,102 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            Int       @id @default(autoincrement())
+  username      String
+  password      String    @db.VarChar(255)
+  firstname     String    @db.VarChar(255)
+  lastname      String?   @db.VarChar(255)
+  role          Role      @default(USER)
+  profile_image String?
+  status        Status    @default(ACTIVE)
+  products      Product[]
+  cart          Cart?
+  sale          Sale[]
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
+
+  @@map("user")
+}
+
+model Product {
+  id          Int              @id @default(autoincrement())
+  name        String
+  image       String?
+  description String?
+  value       Float
+  amount      Int              @default(0)
+  origin      OriginProduct    @default(ORIGINAL)
+  type        TypeProduct
+  carts       ProductOnCarts[]
+  sale        Sale[]
+  creator     User?            @relation(fields: [creatorId], references: [id])
+  creatorId   Int?
+  status      Status           @default(ACTIVE)
+  created_at  DateTime         @default(now())
+  updated_at  DateTime         @updatedAt
+}
+
+model Cart {
+  id         Int              @id @default(autoincrement())
+  user       User             @relation(fields: [userId], references: [id])
+  userId     Int              @unique
+  products   ProductOnCarts[]
+  created_at DateTime         @default(now())
+  updated_at DateTime         @updatedAt
+}
+
+model ProductOnCarts {
+  product    Product  @relation(fields: [productId], references: [id])
+  productId  Int
+  cart       Cart     @relation(fields: [cartId], references: [id])
+  cartId     Int
+  amount     Int      @default(1)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@id([productId, cartId])
+}
+
+model Sale {
+  id               Int      @id() @default(autoincrement())
+  reference_number String
+  product          Product  @relation(fields: [productId], references: [id])
+  productId        Int
+  user             User?    @relation(fields: [userId], references: [id])
+  userId           Int?
+  created_at       DateTime @default(now())
+  updated_at       DateTime @updatedAt
+}
+
+enum Role {
+  USER
+  ADMIN
+  SUPPORT
+}
+
+enum Status {
+  ACTIVE
+  INACTIVE
+}
+
+enum OriginProduct {
+  RESALE
+  ORIGINAL
+}
+
+enum TypeProduct {
+  VASE
+  PLANT
+  OTHER
+  CARE
+}
