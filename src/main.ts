@@ -14,6 +14,7 @@ async function bootstrap() {
     .addTag('Users')
     .addTag('Products')
     .addTag('Cart')
+    .addTag('Sale')
     .addTag('Test')
     .addBearerAuth({ type: "http", scheme: "bearer", bearerFormat: "Token", description: "Token JWT válido." }, "JWT")
     .build();

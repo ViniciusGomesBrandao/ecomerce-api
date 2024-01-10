@@ -15,14 +15,11 @@ export class UsersService {
 
   }
 
-  async create(
-    createUserDto: CreateUserDto
-  ) {
+  async create(createUserDto: CreateUserDto) {
     let output: IOutput;
     try {
 
       //Check if existing user
-      console.log(createUserDto)
       const existingUser = await this.prisma.user.findFirst({
         where: {
           username: createUserDto.username
@@ -57,7 +54,6 @@ export class UsersService {
         message: "Usuário criado com sucesso!",
         data: userData
       }
-
     } catch (error) {
       output = {
         success: false,
@@ -169,7 +165,7 @@ export class UsersService {
             username: updateUserDto.username
           }
         })
-        if(existUser){
+        if (existUser) {
           throw new Error("Username já esta sendo utilizado")
         }
       }
